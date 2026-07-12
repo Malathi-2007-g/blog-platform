@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Inkwell — A Blog Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="navbar">
+    <div class="nav-inner">
+      <a href="#" class="logo">
+        <span class="logo-mark">✦</span> Inkwell
+      </a>
+
+      <nav class="nav-actions">
+        <!-- Shown when logged OUT -->
+        <div id="guestActions" class="auth-actions">
+          <button class="btn btn-ghost" id="openLoginBtn">Log in</button>
+          <button class="btn btn-solid" id="openRegisterBtn">Sign up</button>
+        </div>
+
+        <!-- Shown when logged IN -->
+        <div id="userActions" class="auth-actions hidden">
+          <span class="hello-user">Hi, <strong id="navUserName"></strong></span>
+          <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <p class="hero-eyebrow">// stories, worth writing down</p>
+    <h1 class="hero-title">Words find their<br><em>readers</em> here.</h1>
+    <p class="hero-sub">Publish a post, start a conversation, and see who shows up in the comments.</p>
+  </section>
+
+  <!-- ================= TOAST / MESSAGE BANNER ================= -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- ================= AUTH MODALS ================= -->
+  <div class="modal-backdrop hidden" id="modalBackdrop">
+
+    <!-- Login Form -->
+    <div class="modal" id="loginModal">
+      <button class="modal-close" data-close-modal>&times;</button>
+      <p class="modal-eyebrow">01 — Welcome back</p>
+      <h2 class="modal-title">Log in</h2>
+      <form id="loginForm" class="form">
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" required placeholder="you@example.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" name="password" required placeholder="••••••••" />
+        </label>
+        <button type="submit" class="btn btn-solid btn-block">Log in</button>
+      </form>
+      <p class="modal-switch">New here? <button type="button" id="switchToRegister">Create an account</button></p>
+    </div>
+
+    <!-- Registration Form -->
+    <div class="modal hidden" id="registerModal">
+      <button class="modal-close" data-close-modal>&times;</button>
+      <p class="modal-eyebrow">02 — Join Inkwell</p>
+      <h2 class="modal-title">Create your account</h2>
+      <form id="registerForm" class="form">
+        <label class="field">
+          <span>Name</span>
+          <input type="text" name="name" required placeholder="Ada Lovelace" />
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input type="email" name="email" required placeholder="you@example.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" name="password" required minlength="6" placeholder="At least 6 characters" />
+        </label>
+        <button type="submit" class="btn btn-solid btn-block">Sign up</button>
+      </form>
+      <p class="modal-switch">Already have an account? <button type="button" id="switchToLogin">Log in</button></p>
+    </div>
+
+  </div>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="container">
+
+    <!-- Create Post Form (only visible when logged in) -->
+    <section class="composer hidden" id="composerSection">
+      <p class="section-eyebrow">// new entry</p>
+      <h2 class="section-title">Write something</h2>
+      <form id="postForm" class="form">
+        <label class="field">
+          <span>Title</span>
+          <input type="text" name="title" required placeholder="Give it a headline..." />
+        </label>
+        <label class="field">
+          <span>Content</span>
+          <textarea name="content" rows="5" required placeholder="Start writing..."></textarea>
+        </label>
+        <label class="field">
+  <span>Image URL</span>
+  <input
+    type="text"
+    name="image"
+    placeholder="https://example.com/image.jpg"
+  />
+</label>
+        <button type="submit" class="btn btn-solid">Publish post</button>
+      </form>
+    </section>
+
+    <!-- Prompt for guests -->
+    <section class="guest-prompt" id="guestPrompt">
+      <p><button type="button" id="promptLoginBtn" class="link-btn">Log in</button> or <button type="button" id="promptRegisterBtn" class="link-btn">sign up</button> to publish a post or join the discussion.</p>
+    </section>
+
+    <!-- Blog List Section -->
+    <section class="feed">
+  <p class="section-eyebrow">// the feed</p>
+  <h2 class="section-title">Latest posts</h2>
+
+  <input
+    type="text"
+    id="searchInput"
+    placeholder="Search posts..."
+  >
+
+  <div id="postsList" class="posts-list">
+        <!-- Posts are rendered here by script.js -->
+      </div>
+      <p id="emptyState" class="empty-state hidden">No posts yet — be the first to write one.</p>
+    </section>
+
+  </main>
+
+  <!-- ================= POST CARD TEMPLATE ================= -->
+  <template id="postTemplate">
+    <article class="post-card">
+      <div class="post-stamp"></div>
+      <header class="post-head">
+        <div>
+          <h3 class="post-title"></h3>
+          <p class="post-meta"><span class="post-author"></span> · <time class="post-date"></time></p>
+        </div>
+        <div class="post-owner-actions hidden">
+          <button class="icon-btn edit-post-btn" title="Edit post">Edit</button>
+          <button class="icon-btn delete-post-btn" title="Delete post">Delete</button>
+        </div>
+      </header>
+      <img class="post-image hidden" alt="Blog Image">
+<p class="post-content"></p>
+
+      <div class="post-edit-form hidden">
+        <input type="text" class="edit-title-input" />
+        <textarea rows="4" class="edit-content-input"></textarea>
+        <div class="edit-form-actions">
+          <button class="btn btn-solid btn-small save-edit-btn">Save</button>
+          <button class="btn btn-ghost btn-small cancel-edit-btn">Cancel</button>
+        </div>
+      </div>
+
+      <footer class="post-footer">
+        <button class="like-btn">
+  ❤️ <span class="like-count">0</span>
+</button>
+        <button class="toggle-comments-btn">
+          <span class="comment-count">0</span> comments
+        </button>
+      </footer>
+
+      <div class="comments-section hidden">
+        <div class="comments-list"></div>
+
+        <form class="comment-form">
+          <textarea rows="2" placeholder="Add a comment..." required></textarea>
+          <button type="submit" class="btn btn-solid btn-small">Post comment</button>
+        </form>
+        <p class="comment-login-prompt hidden">
+          <button type="button" class="link-btn comment-login-link">Log in</button> to leave a comment.
+        </p>
+      </div>
+    </article>
+  </template>
+
+  <!-- ================= COMMENT TEMPLATE ================= -->
+  <template id="commentTemplate">
+    <div class="comment">
+      <div class="comment-avatar"></div>
+      <div class="comment-body">
+        <p class="comment-meta"><strong class="comment-author"></strong> <time class="comment-date"></time></p>
+        <p class="comment-text"></p>
+      </div>
+    </div>
+  </template>
+
+  <footer class="site-footer">
+    <p>Inkwell — built with Node.js, Express &amp; MongoDB.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
